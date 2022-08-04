@@ -1,0 +1,10 @@
+.canvas {
+  background: #fafafa;
+}
+
+body {
+  background: #ffffff;
+  font: 12px system-ui;
+  margin: 0px;
+  padding: 0px;
+}

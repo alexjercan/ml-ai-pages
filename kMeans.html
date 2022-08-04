@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Linear Regression</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="kMeans.js"></script>
+    <script type="text/javascript" src="util.js"></script>
+  </head>
+  <body>
+    <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+    <input id="button" type="button" value="Run kMeans" />
+    <input id="clear" type="button" value="Clear" />
+    <canvas id="plot" class="canvas" width="500" height="500"></canvas>
+
+    <script type="text/javascript">
+      let points = [];
+
+      const canvas = document.querySelector("#canvas");
+      canvas.addEventListener("mousedown", function (e) {
+        const point = getCursorPosition(canvas, e);
+        points.push(point);
+        drawPoint(canvas, point);
+      });
+
+      const button = document.querySelector("#button");
+      button.addEventListener("click", function (e) {
+        const X = points.map(p => [p.x, p.y]);
+
+        const kMeans = new KMeans(3, 100);
+        kMeans.fit(X);
+
+        const centroids = kMeans.centroids.map(c => ({ x: c[0], y: c[1] }));
+
+        for (let k = 0; k < kMeans.k; k++) {
+          drawPoint(canvas, centroids[k], color='#ff0000');
+        }
+
+        const errors = kMeans.errors;
+        const plot = document.querySelector("#plot");
+        const xs = Array.from({length: errors.length}, (_, i) => i).map((i) => i * canvas.width / errors.length);
+        const ys = errors.map((error) => (error - errors[errors.length-1]) * canvas.height / (errors[0] - errors[errors.length-1]));
+        scatterPlot(plot, xs, ys);
+        annotatePlot(plot, {x: xs[0] + 10, y: ys[0] - 10}, errors[0]);
+        annotatePlot(plot, {x: xs[errors.length-1] - 50, y: ys[errors.length-1] + 10}, errors[errors.length-1]);
+      });
+
+      const clear = document.querySelector("#clear");
+      clear.addEventListener("click", function (e) {
+        points = [];
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const plot = document.querySelector("#plot");
+        const ctx2 = plot.getContext("2d");
+        ctx2.clearRect(0, 0, plot.width, plot.height);
+      });
+    </script>
+  </body>
+</html>
