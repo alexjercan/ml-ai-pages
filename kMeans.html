@@ -28,7 +28,20 @@
         const kMeans = new KMeans(3, 100);
         kMeans.fit(X);
 
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         const centroids = kMeans.centroids.map(c => ({ x: c[0], y: c[1] }));
+
+        const colors = Array.from({ length: kMeans.k }, () => getRandomColor());
+        const clusters = kMeans.clusters;
+
+        for (let i = 0; i < clusters.length; i++) {
+          const cluster = clusters[i];
+          const color = colors[cluster];
+          drawPoint(canvas, points[i], color);
+        }
 
         for (let k = 0; k < kMeans.k; k++) {
           drawPoint(canvas, centroids[k], color='#ff0000');
